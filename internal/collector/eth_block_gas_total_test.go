@@ -41,7 +41,7 @@ func TestEthBlockGasTotalCollectError(t *testing.T) {
 
 func TestEthBlockGasTotalCollect(t *testing.T) {
 	rpcServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := w.Write([]byte(`{"result": {"gasUsed": 0x0 }}"`))
+		_, err := w.Write([]byte(`{"result": {"gasUsed": "0x0" }}"`))
 		if err != nil {
 			t.Fatalf("could not write a response: %#v", err)
 		}
