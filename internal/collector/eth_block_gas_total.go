@@ -32,10 +32,11 @@ func (collector *EthBlockGasTotal) Describe(ch chan<- *prometheus.Desc) {
 
 func (collector *EthBlockGasTotal) Collect(ch chan<- prometheus.Metric) {
 	var result *gasResult
-	if err := collector.rpc.Call(&result, "eth_getBlockByNumber", "\"latest\", true" ); err != nil {
+	if err := collector.rpc.Call(&result, "eth_getBlockByNumber", "latest", true ); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
+	
 	value := float64(result.gasUsed)
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
 }
