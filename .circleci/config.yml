@@ -1,6 +1,6 @@
 defaults: &defaults
   environment:
-    DOCKER_IMAGE_NAME: 31z4/ethereum-prometheus-exporter
+    DOCKER_IMAGE_NAME: fortelabsinc/ethereum-prometheus-exporter
 
 tags_filter: &tags_filter
   tags:
