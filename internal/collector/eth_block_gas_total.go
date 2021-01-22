@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"fmt"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -33,12 +32,10 @@ func (collector *EthBlockGasTotal) Describe(ch chan<- *prometheus.Desc) {
 
 func (collector *EthBlockGasTotal) Collect(ch chan<- prometheus.Metric) {
 	var result *gasResult
-	if err := collector.rpc.Call(&result, "eth_getBlockByNumber", "latest, true" ); err != nil {
-		fmt.Println("something went wrong")
+	if err := collector.rpc.Call(&result, "eth_getBlockByNumber", "\"latest\", true" ); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-	fmt.Println(result)
 	value := float64(result.gasUsed)
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
 }
