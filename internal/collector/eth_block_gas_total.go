@@ -1,6 +1,8 @@
 package collector
 
 import (
+	 "log"
+
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
@@ -37,7 +39,7 @@ func (collector *EthBlockGasTotal) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-
+	log.Println(result)
 	value := float64(result.GasLimit)
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
 }
