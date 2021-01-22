@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -11,7 +12,7 @@ type EthBlockGasTotal struct {
 }
 
 type gasResult struct {
-	gasLimit    uint64
+	gasLimit    hexutil.Uint64
 }
 
 func NewEthBlockGasTotal(rpc *rpc.Client) *EthBlockGasTotal {
