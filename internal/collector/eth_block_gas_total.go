@@ -11,7 +11,7 @@ type EthBlockGasTotal struct {
 }
 
 type gasResult struct {
-	gasUsed    uint64
+	gasLimit    uint64
 }
 
 func NewEthBlockGasTotal(rpc *rpc.Client) *EthBlockGasTotal {
@@ -36,7 +36,7 @@ func (collector *EthBlockGasTotal) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-	
-	value := float64(result.gasUsed)
+
+	value := float64(result.gasLimit)
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
 }
