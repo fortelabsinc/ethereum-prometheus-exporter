@@ -13,7 +13,7 @@ type EthBlockGasTotal struct {
 }
 
 type gasResult struct {
-	Difficulty hexutil.Uint64
+	Size hexutil.Uint64
 }
 
 func NewEthBlockGasTotal(rpc *rpc.Client) *EthBlockGasTotal {
@@ -45,6 +45,6 @@ func (collector *EthBlockGasTotal) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	value := float64(result.Difficulty)
+	value := float64(result.Size)
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
 }
