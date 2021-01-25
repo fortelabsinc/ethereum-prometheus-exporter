@@ -2,6 +2,7 @@ package collector
 
 import (
 	"encoding/json"
+	"math/big"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
@@ -13,7 +14,7 @@ type EthBlockGasTotal struct {
 }
 
 type gasResult struct {
-	Size hexutil.Uint64
+	Size hexutil.Big
 }
 
 func NewEthBlockGasTotal(rpc *rpc.Client) *EthBlockGasTotal {
@@ -45,6 +46,7 @@ func (collector *EthBlockGasTotal) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	value := float64(result.Size)
+	i := (*big.Int)(&result.Size)
+	value, _ := new(big.Float).SetInt(i).Float64()
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
 }
