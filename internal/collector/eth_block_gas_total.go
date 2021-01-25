@@ -1,8 +1,7 @@
 package collector
 
 import (
-	 "log"
-
+	"encoding/json"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
@@ -34,12 +33,18 @@ func (collector *EthBlockGasTotal) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (collector *EthBlockGasTotal) Collect(ch chan<- prometheus.Metric) {
-	var result *gasResult
-	if err := collector.rpc.Call(&result, "eth_getBlockByNumber", "latest", true ); err != nil {
+	var raw json.RawMessage
+	if err := collector.rpc.Call(&raw, "eth_getBlockByNumber", "latest", true ); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-	log.Println(result)
+
+	var result *gasResult
+	if err := json.Unmarshal(raw, &result); err != nil {
+		ch <- prometheus.NewInvalidMetric(collector.desc, err)
+		return
+	}
+
 	value := float64(result.GasLimit)
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
 }
