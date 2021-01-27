@@ -61,6 +61,9 @@ func main() {
 		collector.NewEthSyncing(rpc),
 		collector.NewParityNetPeers(rpc),
 		collector.NewEthBlockGasTotal(rpc),
+		collector.NewParityVersionInfoMajor(rpc),
+		collector.NewParityVersionInfoMinor(rpc),
+		collector.NewParityVersionInfoPatch(rpc),
 	)
 
 	handler := promhttp.HandlerFor(registry, promhttp.HandlerOpts{
