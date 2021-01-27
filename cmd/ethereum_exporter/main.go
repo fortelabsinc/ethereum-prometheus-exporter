@@ -64,6 +64,7 @@ func main() {
 		collector.NewParityVersionInfoMajor(rpc),
 		collector.NewParityVersionInfoMinor(rpc),
 		collector.NewParityVersionInfoPatch(rpc),
+		collector.NewParityBlockGapStatus(rpc),
 	)
 
 	handler := promhttp.HandlerFor(registry, promhttp.HandlerOpts{
