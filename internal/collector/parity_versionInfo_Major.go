@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"strconv"
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
@@ -12,9 +13,9 @@ type ParityVersionInfoMajor struct {
 }
 
 type version struct {
-	Major uint
-	Minor uint
-	Patch uint	
+	Major int
+	Minor int
+	Patch int	
 }
 
 type versionResult struct {
@@ -27,7 +28,7 @@ func NewParityVersionInfoMajor(rpc *rpc.Client) *ParityVersionInfoMajor {
 		desc: prometheus.NewDesc(
 			"parity_versionInfo_Major",
 			"Provides information about running version of Parity major version",
-			nil,
+			[]string{"version"},
 			nil,
 		),
 	}
@@ -50,6 +51,6 @@ func (collector *ParityVersionInfoMajor) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	value := float64(result.Version.Major)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, "version")
+	value := strconv.Itoa(result.Version.Major) + "." + strconv.Itoa(result.Version.Minor) + "." + strconv.Itoa(result.Version.Patch)
+	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0, value )
 }
