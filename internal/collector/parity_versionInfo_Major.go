@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"strconv"
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
