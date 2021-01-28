@@ -26,8 +26,8 @@ func NewParityVersionInfo(rpc *rpc.Client) *ParityVersionInfo {
 	return &ParityVersionInfo{
 		rpc: rpc,
 		desc: prometheus.NewDesc(
-			"parity_versionInfo_",
-			"Provides information about running version of Parity  version",
+			"parity_versionInfo",
+			"Provides information about running version of Parity version",
 			[]string{"version"},
 			nil,
 		),
@@ -50,7 +50,7 @@ func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-	
+	var value float64 = 0
 	versionValue := strconv.Itoa(result.Version.Major) + "." + strconv.Itoa(result.Version.Minor) + "." + strconv.Itoa(result.Version.Patch)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0, versionValue )
+	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, versionValue )
 }
