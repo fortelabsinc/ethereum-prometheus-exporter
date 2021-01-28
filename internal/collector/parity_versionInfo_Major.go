@@ -51,6 +51,5 @@ func (collector *ParityVersionInfoMajor) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	value := strconv.Itoa(result.Version.Major) + "." + strconv.Itoa(result.Version.Minor) + "." + strconv.Itoa(result.Version.Patch)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0, value )
+	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0, "2.7.1" )
 }
