@@ -61,9 +61,7 @@ func main() {
 		collector.NewEthSyncing(rpc),
 		collector.NewParityNetPeers(rpc),
 		collector.NewEthBlockGasTotal(rpc),
-		collector.NewParityVersionInfoMajor(rpc),
-		collector.NewParityVersionInfoMinor(rpc),
-		collector.NewParityVersionInfoPatch(rpc),
+		collector.NewParityVersionInfo(rpc),
 		collector.NewParityBlockGapStatus(rpc),
 	)
 

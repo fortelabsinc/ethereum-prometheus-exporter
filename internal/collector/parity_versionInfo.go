@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type ParityVersionInfoMajor struct {
+type ParityVersionInfo struct {
 	rpc           *rpc.Client
 	desc    *prometheus.Desc
 }
@@ -22,23 +22,23 @@ type versionResult struct {
 	Version version
 }
 
-func NewParityVersionInfoMajor(rpc *rpc.Client) *ParityVersionInfoMajor {
-	return &ParityVersionInfoMajor{
+func NewParityVersionInfo(rpc *rpc.Client) *ParityVersionInfo {
+	return &ParityVersionInfo{
 		rpc: rpc,
 		desc: prometheus.NewDesc(
-			"parity_versionInfo_Major",
-			"Provides information about running version of Parity major version",
+			"parity_versionInfo_",
+			"Provides information about running version of Parity  version",
 			[]string{"version"},
 			nil,
 		),
 	}
 }
 
-func (collector *ParityVersionInfoMajor) Describe(ch chan<- *prometheus.Desc) {
+func (collector *ParityVersionInfo) Describe(ch chan<- *prometheus.Desc) {
 	ch <- collector.desc
 }
 
-func (collector *ParityVersionInfoMajor) Collect(ch chan<- prometheus.Metric) {
+func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
 	var raw json.RawMessage
 	if err := collector.rpc.Call(&raw, "parity_versionInfo"); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc , err)
@@ -50,7 +50,7 @@ func (collector *ParityVersionInfoMajor) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-	value := float64(0)
+	
 	versionValue := strconv.Itoa(result.Version.Major) + "." + strconv.Itoa(result.Version.Minor) + "." + strconv.Itoa(result.Version.Patch)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, versionValue )
+	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0, versionValue )
 }
