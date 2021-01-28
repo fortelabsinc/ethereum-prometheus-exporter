@@ -1,7 +1,7 @@
 package collector
 
 import (
-	"strconv"
+	// "strconv"
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
@@ -51,6 +51,6 @@ func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 	value := float64(0)
-	versionValue := strconv.Itoa(result.Version.Major) + "." + strconv.Itoa(result.Version.Minor) + "." + strconv.Itoa(result.Version.Patch)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, versionValue)
+	// versionValue := strconv.Itoa(result.Version.Major) + "." + strconv.Itoa(result.Version.Minor) + "." + strconv.Itoa(result.Version.Patch)
+	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, "teszt")
 }
