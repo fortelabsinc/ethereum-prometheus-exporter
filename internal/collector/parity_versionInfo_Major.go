@@ -51,5 +51,5 @@ func (collector *ParityVersionInfoMajor) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	value := float64(result.Version.Major)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
+	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, "version")
 }
