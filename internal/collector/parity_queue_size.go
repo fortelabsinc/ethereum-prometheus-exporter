@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"encoding/json"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -29,15 +28,9 @@ func (collector *ParityQueueSize) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (collector *ParityQueueSize) Collect(ch chan<- prometheus.Metric) {
-	var raw json.RawMessage
-	if err := collector.rpc.Call(&raw, "parity_accountsInfo"); err != nil {
-		ch <- prometheus.NewInvalidMetric(collector.desc , err)
-		return
-	}
-
 	var result *[]interface{}
-	if err := json.Unmarshal(raw, &result); err != nil {
-		ch <- prometheus.NewInvalidMetric(collector.desc, err)
+	if err := collector.rpc.Call(&result, "parity_allTransactions"); err != nil {
+		ch <- prometheus.NewInvalidMetric(collector.desc , err)
 		return
 	}
 
