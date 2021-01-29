@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -11,9 +10,6 @@ type ParityQueueSize struct {
 	desc    *prometheus.Desc
 }
 
-type QueueSizeResult struct {
-	BlockGap []hexutil.Uint64
-}
 
 func NewParityQueueSize(rpc *rpc.Client) *ParityQueueSize {
 	return &ParityQueueSize{
