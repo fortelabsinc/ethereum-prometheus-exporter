@@ -28,7 +28,7 @@ func (collector *ParityQueueSize) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (collector *ParityQueueSize) Collect(ch chan<- prometheus.Metric) {
-	var result *[]interface{}
+	var result *[]struct{}
 	if err := collector.rpc.Call(&result, "parity_accountsInfo"); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc , err)
 		return
