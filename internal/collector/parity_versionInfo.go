@@ -50,7 +50,7 @@ func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-	value := float64(0)
+	value := float64(1)
 	versionValue := strconv.Itoa(result.Version.Major) + "." + strconv.Itoa(result.Version.Minor) + "." + strconv.Itoa(result.Version.Patch)
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, versionValue)
 }
