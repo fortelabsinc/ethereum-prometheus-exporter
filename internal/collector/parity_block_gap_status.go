@@ -47,6 +47,8 @@ func (collector *ParityBlockGapStatus) Collect(ch chan<- prometheus.Metric) {
 
 	value := float64(len(result.BlockGap))
 	if value > 0 {
+		value = 0
+	}else {
 		value = 1
 	}
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
