@@ -3,6 +3,7 @@ package collector
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -36,11 +37,14 @@ func (collector *ParityBlockGapStatus) Describe(ch chan<- *prometheus.Desc) {
 
 func (collector *ParityBlockGapStatus) Collect(ch chan<- prometheus.Metric) {
 	var raw json.RawMessage
+	start := time.Now()
 	if err := collector.rpc.Call(&raw, "parity_chainStatus"); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-	log.Print("teszt")
+	end := time.Now()
+
+	log.Print("parity_chainStatus: ", end.Sub(start))
 	var result *blockGapStatusResult
 	if err := json.Unmarshal(raw, &result); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
