@@ -19,7 +19,7 @@ func NewParityVersionInfo(rpc *rpc.Client) *ParityVersionInfo {
 		desc: prometheus.NewDesc(
 			"parity_versionInfo",
 			"Provides information about running version of Parity version",
-			nil,
+			[]string{"version"},
 			nil,
 		),
 	}
@@ -41,12 +41,6 @@ func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
 	end := time.Now()
 
 	log.Print("web3_clientVersion: ", end.Sub(start))
-	log.Print(result)
-	// if err := json.Unmarshal(raw, &result); err != nil {
-	// 	ch <- prometheus.NewInvalidMetric(collector.desc, err)
-	// 	return
-	// }
 	value := float64(1)
-	// versionValue := strconv.Itoa(result.Version.Major) + "." + strconv.Itoa(result.Version.Minor) + "." + strconv.Itoa(result.Version.Patch)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
+	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, result)
 }
