@@ -1,21 +1,24 @@
 package collector
 
 import (
-	"strconv"
 	"encoding/json"
+	"log"
+	"strconv"
+	"time"
+
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type ParityVersionInfo struct {
-	rpc           *rpc.Client
-	desc    *prometheus.Desc
+	rpc  *rpc.Client
+	desc *prometheus.Desc
 }
 
 type version struct {
 	Major int
 	Minor int
-	Patch int	
+	Patch int
 }
 
 type versionResult struct {
@@ -40,11 +43,16 @@ func (collector *ParityVersionInfo) Describe(ch chan<- *prometheus.Desc) {
 
 func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
 	var raw json.RawMessage
+	start := time.Now()
 	if err := collector.rpc.Call(&raw, "parity_versionInfo"); err != nil {
-		ch <- prometheus.NewInvalidMetric(collector.desc , err)
+		errorEnd := time.Now()
+		log.Print("error parityVersionInfo: ", errorEnd.Sub(start))
+		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
+	end := time.Now()
 
+	log.Print("parity_versionInfo: ", end.Sub(start))
 	var result *versionResult
 	if err := json.Unmarshal(raw, &result); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
