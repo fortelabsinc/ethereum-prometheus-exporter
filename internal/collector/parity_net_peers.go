@@ -1,6 +1,9 @@
 package collector
 
 import (
+	"log"
+	"time"
+
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -41,11 +44,14 @@ func (collector *ParityNetPeers) Describe(ch chan<- *prometheus.Desc) {
 
 func (collector *ParityNetPeers) Collect(ch chan<- prometheus.Metric) {
 	var result *peersResult
+	start := time.Now()
 	if err := collector.rpc.Call(&result, "parity_netPeers"); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.activeDesc, err)
 		ch <- prometheus.NewInvalidMetric(collector.connectedDesc, err)
 		return
 	}
+	end := time.Now()
+	log.Print("parity_netPeers: ", end.Sub(start))
 
 	value := float64(result.Active)
 	ch <- prometheus.MustNewConstMetric(collector.activeDesc, prometheus.GaugeValue, value)
