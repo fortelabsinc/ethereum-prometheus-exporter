@@ -2,14 +2,16 @@ package collector
 
 import (
 	"encoding/json"
+	"log"
+
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type ParityBlockGapStatus struct {
-	rpc           *rpc.Client
-	desc    *prometheus.Desc
+	rpc  *rpc.Client
+	desc *prometheus.Desc
 }
 
 type blockGapStatusResult struct {
@@ -35,10 +37,10 @@ func (collector *ParityBlockGapStatus) Describe(ch chan<- *prometheus.Desc) {
 func (collector *ParityBlockGapStatus) Collect(ch chan<- prometheus.Metric) {
 	var raw json.RawMessage
 	if err := collector.rpc.Call(&raw, "parity_chainStatus"); err != nil {
-		ch <- prometheus.NewInvalidMetric(collector.desc , err)
+		ch <- prometheus.NewInvalidMetric(collector.desc, err)
 		return
 	}
-
+	log.Print("teszt")
 	var result *blockGapStatusResult
 	if err := json.Unmarshal(raw, &result); err != nil {
 		ch <- prometheus.NewInvalidMetric(collector.desc, err)
@@ -48,7 +50,7 @@ func (collector *ParityBlockGapStatus) Collect(ch chan<- prometheus.Metric) {
 	value := float64(len(result.BlockGap))
 	if value > 0 {
 		value = 0
-	}else {
+	} else {
 		value = 1
 	}
 	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
