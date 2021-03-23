@@ -30,7 +30,7 @@ func (collector *ParityVersionInfo) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
-	var result *[]interface{}
+	var result string
 	start := time.Now()
 	if err := collector.rpc.Call(&result, "web3_clientVersion"); err != nil {
 		errorEnd := time.Now()
@@ -41,7 +41,7 @@ func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
 	end := time.Now()
 
 	log.Print("web3_clientVersion: ", end.Sub(start))
-	log.Print(*result)
+	log.Print(result)
 	// if err := json.Unmarshal(raw, &result); err != nil {
 	// 	ch <- prometheus.NewInvalidMetric(collector.desc, err)
 	// 	return
