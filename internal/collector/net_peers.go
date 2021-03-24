@@ -55,6 +55,5 @@ func (collector *NetPeerCount) Collect(ch chan<- prometheus.Metric) {
 	case <-timer.C:
 		log.Print("net_peerCount Timed out")
 		ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0)
-		close(ch)
 	}
 }
