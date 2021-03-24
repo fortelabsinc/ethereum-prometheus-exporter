@@ -34,12 +34,14 @@ func (collector *EthGasPrice) Describe(ch chan<- *prometheus.Desc) {
 func (collector *EthGasPrice) Collect(ch chan<- prometheus.Metric) {
 	var result hexutil.Big
 	start := time.Now()
-	if err := collector.rpc.Call(&result, "eth_gasPrice"); err != nil {
-		errorEnd := time.Now()
-		log.Print("error eth_gasPrice: ", errorEnd.Sub(start))
-		ch <- prometheus.NewInvalidMetric(collector.desc, err)
-		return
-	}
+	time.AfterFunc(3*time.Second, func() {
+		if err := collector.rpc.Call(&result, "eth_gasPrice"); err != nil {
+			errorEnd := time.Now()
+			log.Print("error eth_gasPrice: ", errorEnd.Sub(start))
+			ch <- prometheus.NewInvalidMetric(collector.desc, err)
+			return
+		}
+	})
 	end := time.Now()
 	log.Print("eth_gasPrice: ", end.Sub(start))
 	i := (*big.Int)(&result)
