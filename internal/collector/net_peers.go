@@ -32,11 +32,14 @@ func (collector *NetPeerCount) Describe(ch chan<- *prometheus.Desc) {
 
 func (collector *NetPeerCount) Collect(ch chan<- prometheus.Metric) {
 	var result hexutil.Uint64
+
 	start := time.Now()
-	if err := collector.rpc.Call(&result, "net_peerCount"); err != nil {
-		ch <- prometheus.NewInvalidMetric(collector.desc, err)
-		return
-	}
+	time.AfterFunc(3*time.Second, func() {
+		if err := collector.rpc.Call(&result, "net_peerCount"); err != nil {
+			ch <- prometheus.NewInvalidMetric(collector.desc, err)
+			return
+		}
+	})
 	end := time.Now()
 	log.Print("net_peerCount: ", end.Sub(start))
 
