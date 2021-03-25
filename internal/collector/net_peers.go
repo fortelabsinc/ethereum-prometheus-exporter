@@ -32,12 +32,12 @@ func (collector *NetPeerCount) Describe(ch chan<- *prometheus.Desc) {
 
 func (collector *NetPeerCount) Collect(ch chan<- prometheus.Metric) {
 
-	start := time.Now()
 	timeoutChannel := make(chan prometheus.Metric, 1)
 	defer close(timeoutChannel)
 
 	go func() {
 		var result hexutil.Uint64
+		start := time.Now()
 		if err := collector.rpc.Call(&result, "net_peerCount"); err != nil {
 			timeoutChannel <- prometheus.NewInvalidMetric(collector.desc, err)
 			return

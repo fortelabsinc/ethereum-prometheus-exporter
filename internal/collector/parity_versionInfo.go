@@ -30,17 +30,33 @@ func (collector *ParityVersionInfo) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (collector *ParityVersionInfo) Collect(ch chan<- prometheus.Metric) {
-	var result string
-	start := time.Now()
-	if err := collector.rpc.Call(&result, "web3_clientVersion"); err != nil {
-		errorEnd := time.Now()
-		log.Print("error web3_clientVersion: ", errorEnd.Sub(start))
-		ch <- prometheus.NewInvalidMetric(collector.desc, err)
-		return
-	}
-	end := time.Now()
+	timeoutChannel := make(chan prometheus.Metric, 1)
+	defer close(timeoutChannel)
 
-	log.Print("web3_clientVersion: ", end.Sub(start))
-	value := float64(1)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, result)
+	go func() {
+		var result string
+		start := time.Now()
+		if err := collector.rpc.Call(&result, "web3_clientVersion"); err != nil {
+			errorEnd := time.Now()
+			log.Print("error web3_clientVersion: ", errorEnd.Sub(start))
+			timeoutChannel <- prometheus.NewInvalidMetric(collector.desc, err)
+			return
+		}
+		end := time.Now()
+
+		log.Print("web3_clientVersion: ", end.Sub(start))
+		value := float64(1)
+		timeoutChannel <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value, result)
+	}()
+	timer := time.NewTimer(2 * time.Second)
+	defer timer.Stop()
+
+	select {
+	case rpcCallResult := <-timeoutChannel:
+		ch <- rpcCallResult
+	case <-timer.C:
+		log.Print("net_peerCount Timed out")
+		ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0)
+	}
+
 }

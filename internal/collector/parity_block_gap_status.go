@@ -36,26 +36,41 @@ func (collector *ParityBlockGapStatus) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (collector *ParityBlockGapStatus) Collect(ch chan<- prometheus.Metric) {
-	var raw json.RawMessage
-	start := time.Now()
-	if err := collector.rpc.Call(&raw, "parity_chainStatus"); err != nil {
-		ch <- prometheus.NewInvalidMetric(collector.desc, err)
-		return
-	}
-	end := time.Now()
+	timeoutChannel := make(chan prometheus.Metric, 1)
+	defer close(timeoutChannel)
+	go func() {
+		var raw json.RawMessage
+		start := time.Now()
+		if err := collector.rpc.Call(&raw, "parity_chainStatus"); err != nil {
+			timeoutChannel <- prometheus.NewInvalidMetric(collector.desc, err)
+			return
+		}
+		end := time.Now()
 
-	log.Print("parity_chainStatus: ", end.Sub(start))
-	var result *blockGapStatusResult
-	if err := json.Unmarshal(raw, &result); err != nil {
-		ch <- prometheus.NewInvalidMetric(collector.desc, err)
-		return
+		log.Print("parity_chainStatus: ", end.Sub(start))
+		var result *blockGapStatusResult
+		if err := json.Unmarshal(raw, &result); err != nil {
+			timeoutChannel <- prometheus.NewInvalidMetric(collector.desc, err)
+			return
+		}
+
+		value := float64(len(result.BlockGap))
+		if value > 0 {
+			value = 0
+		} else {
+			value = 1
+		}
+		timeoutChannel <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
+	}()
+	timer := time.NewTimer(2 * time.Second)
+	defer timer.Stop()
+
+	select {
+	case rpcCallResult := <-timeoutChannel:
+		ch <- rpcCallResult
+	case <-timer.C:
+		log.Print("net_peerCount Timed out")
+		ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0)
 	}
 
-	value := float64(len(result.BlockGap))
-	if value > 0 {
-		value = 0
-	} else {
-		value = 1
-	}
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
 }
