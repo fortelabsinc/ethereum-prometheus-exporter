@@ -57,7 +57,7 @@ func main() {
 		// collector.NewEthEarliestBlockTransactions(rpc),
 		// collector.NewEthLatestBlockTransactions(rpc),
 		// collector.NewEthPendingBlockTransactions(rpc),
-		// collector.NewEthHashrate(rpc),
+		collector.NewEthHashrate(rpc),
 		// collector.NewEthSyncing(rpc),
 		// collector.NewParityNetPeers(rpc),
 		// collector.NewEthBlockGasTotal(rpc),

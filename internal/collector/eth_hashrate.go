@@ -31,14 +31,32 @@ func (collector *EthHashrate) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (collector *EthHashrate) Collect(ch chan<- prometheus.Metric) {
-	var result hexutil.Uint64
-	start := time.Now()
-	if err := collector.rpc.Call(&result, "eth_hashrate"); err != nil {
-		ch <- prometheus.NewInvalidMetric(collector.desc, err)
-		return
+	timeoutChannel := make(chan prometheus.Metric, 1)
+	defer close(timeoutChannel)
+
+	go func() {
+
+		var result hexutil.Uint64
+		start := time.Now()
+		if err := collector.rpc.Call(&result, "eth_hashrate"); err != nil {
+			timeoutChannel <- prometheus.NewInvalidMetric(collector.desc, err)
+			return
+		}
+		end := time.Now()
+		log.Print("eth_hashrate: ", end.Sub(start))
+		value := float64(result)
+		timeoutChannel <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
+
+	}()
+
+	timer := time.NewTimer(2 * time.Second)
+	defer timer.Stop()
+	select {
+	case rpcCallResult := <-timeoutChannel:
+		ch <- rpcCallResult
+	case <-timer.C:
+		log.Print("net_peerCount Timed out")
+		ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, 0)
 	}
-	end := time.Now()
-	log.Print("eth_hashrate: ", end.Sub(start))
-	value := float64(result)
-	ch <- prometheus.MustNewConstMetric(collector.desc, prometheus.GaugeValue, value)
+
 }
